@@ -98,6 +98,10 @@ Examples
     
     use Rack::Throttle::Interval, :cache => Redis.new, :key_prefix => :throttle
 
+### Changing the cache key (note you'll need to explicitly extract the ip address, assuming you want to want this to form part of the key)
+
+    use Rack::Throttle::Interval, :key => Proc.new { |request| request.content_type + request.ip }
+    
 Throttling Strategies
 ---------------------
 
