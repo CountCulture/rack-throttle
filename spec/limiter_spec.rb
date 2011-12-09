@@ -59,28 +59,31 @@ describe Rack::Throttle::Limiter do
   end
   
   # Would be nicer not to test the protected method explicitly, but seemed somewhat complex, as cache_key only called from subclasses
-  describe "with no cache :key_prefix supplied" do
-    let(:app) { Rack::Throttle::Limiter.new(target_app ) }
-    it "should use request ip address as cache_key" do
-      req = mock('request', :ip => '1.2.3.4')
-      app.send(:cache_key,req).should == '1.2.3.4'
+  describe ":cache_key" do
+    before do
+      @req = mock('request', :ip => '1.2.3.4', :path => '/foo/bar')
     end
-  end
-
-  describe "with cache :key_prefix" do
-    let(:app) { Rack::Throttle::Limiter.new(target_app, :key_prefix => 'foo' ) }
-    it "should join key_prefix and ip address for cache_key" do
-      req = mock('request', :ip => '1.2.3.4')
-      app.send(:cache_key,req).should == 'foo:1.2.3.4'
+    
+    describe "with no cache :key_prefix supplied" do
+      let(:app) { Rack::Throttle::Limiter.new(target_app ) }
+      it "should use request ip address as cache_key" do
+        app.send(:cache_key, @req).should == '1.2.3.4'
+      end
     end
-  end
 
-  describe "with proc supplied for cache :key" do
-    key = Proc.new { |request| 'baz' + request.path}
-    let(:app) { Rack::Throttle::Limiter.new(target_app, :key => key ) }
-    it "should join key_prefix and ip address for cache_key" do
-      req = mock('request', :ip => '1.2.3.4', :path => '/foo/bar')
-      app.send(:cache_key,req).should == 'baz/foo/bar'
+    describe "with cache :key_prefix" do
+      let(:app) { Rack::Throttle::Limiter.new(target_app, :key_prefix => 'foo' ) }
+      it "should join key_prefix and ip address for cache_key" do
+        app.send(:cache_key, @req).should == 'foo:1.2.3.4'
+      end
+    end
+
+    describe "with proc supplied for cache :key" do
+      key = Proc.new { |request| 'baz' + request.path}
+      let(:app) { Rack::Throttle::Limiter.new(target_app, :key => key ) }
+      it "should call proc with given request" do
+        app.send(:cache_key, @req).should == 'baz/foo/bar'
+      end
     end
   end
 end
