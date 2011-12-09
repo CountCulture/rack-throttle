@@ -24,13 +24,12 @@ module Rack; module Throttle
     def initialize(app, options = {})
       super
     end
-
-    ##
-    def max_per_hour
-      @max_per_hour ||= options[:max_per_hour] || max_option || 3_600
+    
+    def default_max_value
+      3_600
     end
 
-    alias_method :max_per_window, :max_per_hour
+    alias_method :max_per_hour, :max_per_window
 
     protected
 

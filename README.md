@@ -82,7 +82,7 @@ Examples
 
 ### Using a proc for max value
 
-    use Rack::Throttle::Hourly,   :max => Proc.new { |request| request.path.match(/api_token=/) ? 1000 : 100 }  
+    use Rack::Throttle::Hourly,   :max => Proc.new { |request| request.params['api_token'] ? 1000 : 100 }  
 
 ### Storing the rate-limiting counters in a GDBM database
 
