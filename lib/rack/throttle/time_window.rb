@@ -17,5 +17,10 @@ module Rack; module Throttle
         allowed = true
       end
     end
+    
+    protected
+    def max_option(request)
+      options[:max].is_a?(Proc) ? options[:max].call(request) : options[:max] 
+    end
   end
 end; end

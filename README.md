@@ -77,8 +77,12 @@ Examples
 
     use Rack::Throttle::Daily,    :max => 1000  # requests
     use Rack::Throttle::Hourly,   :max => 100   # requests
-    use Rack::Throttle::Hourly,   :max => 60    # requests
+    use Rack::Throttle::Minute,   :max => 60    # requests
     use Rack::Throttle::Interval, :min => 3.0   # seconds
+
+### Using a proc for max value
+
+    use Rack::Throttle::Hourly,   :max => Proc.new { |request| request.path.match(/api_token=/) ? 1000 : 100 }  
 
 ### Storing the rate-limiting counters in a GDBM database
 

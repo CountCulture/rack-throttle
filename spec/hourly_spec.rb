@@ -20,7 +20,7 @@ describe Rack::Throttle::Hourly do
     last_response.body.should show_throttled_response
   end
   
-  it "should not count last hours requests against today" do
+  it "should not count last hour's requests against this hour's" do
     one_hour_ago = Time.now
     Timecop.freeze(DateTime.now - 1/24.0) do
       4.times { get "/foo" }
