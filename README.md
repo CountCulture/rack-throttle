@@ -109,7 +109,7 @@ Examples
 Throttling Strategies
 ---------------------
 
-`Rack::Throttle` supports three built-in throttling strategies:
+`Rack::Throttle` supports four built-in throttling strategies:
 
 * `Rack::Throttle::Interval`: Throttles the application by enforcing a
   minimum interval (by default, 1 second) between subsequent HTTP requests.
