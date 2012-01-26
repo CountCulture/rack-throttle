@@ -44,6 +44,47 @@ describe Rack::Throttle::Limiter do
         get "/foo"
         last_response.body.should show_allowed_response
       end
+
+      context "and proc passed as :skip_throttling option" do
+        let(:app) { Rack::Throttle::Limiter.new(target_app, :skip_throttling => Proc.new{ |req| req.path.match(/baz/) } ) }
+
+        context "and proc returns false" do
+          it "should return true if whitelisted" do
+            app.should_receive(:whitelisted?).and_return(true)
+            get "/foo"
+            last_response.body.should show_allowed_response
+          end
+
+          it "should return false if blacklisted" do
+            app.should_receive(:blacklisted?).and_return(true)
+            get "/foo"
+            last_response.body.should show_throttled_response
+          end
+        end
+
+        context "and proc returns false" do
+          before do
+            @bar_req = mock('request', :ip => '1.2.3.4', :path => '/bar/baz')
+          end
+
+          it "should ignore whitelisting" do
+            app.should_not_receive(:whitelisted?)
+            get "/baz"
+          end 
+
+          it "should ignore blacklisting" do
+            app.should_not_receive(:blacklisted?)
+            get "/baz"
+          end
+
+          it 'should return true' do
+            get "/baz"
+            last_response.body.should_not show_throttled_response
+          end
+        end
+
+      end
+
     end
   end
 

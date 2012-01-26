@@ -84,6 +84,10 @@ Examples
 
     use Rack::Throttle::Hourly,   :max => Proc.new { |request| request.params['api_token'] ? 1000 : 100 }  
 
+### Using a proc to skip throttling for certain requests
+
+    use Rack::Throttle::Hourly,   :skip_throttling => Proc.new { |request| request.path_info.match(/documentation/) }  
+
 ### Storing the rate-limiting counters in a GDBM database
 
     require 'gdbm'

@@ -50,13 +50,6 @@ describe Rack::Throttle::TimeWindow do
       app.allowed?(@req)
     end 
     
-    it "should return true if problem setting cache" do
-      app.stub(:cache_key).and_return('foo:123')
-      app.stub(:cache_get).and_return(10)
-      app.should_receive(:cache_set).with('foo:123', 11)
-      app.allowed?(@req)
-    end 
-    
     it "should return true if cached value less than max_per_window" do
       app.should_receive(:max_per_window).and_return(10)
       app.should_receive(:cache_get).and_return(9)
@@ -82,6 +75,48 @@ describe Rack::Throttle::TimeWindow do
       app.allowed?(@req).should be_true
     end 
     
+    context "and proc passed as :skip_throttling option" do
+      let(:app) { Rack::Throttle::TimeWindow.new(target_app, :skip_throttling => Proc.new{ |req| req.path.match(/baz/) } ) }
+      
+      context "and proc returns false" do
+        it "should get cached value for calculated cache_key for request" do
+          app.should_receive(:cache_key).with(@req).and_return('foo:123')
+          app.should_receive(:cache_get).with('foo:123')
+          app.allowed?(@req)
+        end 
+
+        it "should increment cached value" do
+          app.stub(:cache_key).and_return('foo:123')
+          app.stub(:cache_get).and_return(10)
+          app.should_receive(:cache_set).with('foo:123', 11)
+          app.allowed?(@req)
+        end 
+      end
+      
+      context "and proc returns true" do
+        before do
+          @bar_req = mock('request', :ip => '1.2.3.4', :path => '/bar/baz')
+        end
+        
+        it "should not get cached value for calculated cache_key for request" do
+          app.should_not_receive(:cache_key).with(@req).and_return('foo:123')
+          app.should_not_receive(:cache_get).with('foo:123')
+          app.allowed?(@bar_req)
+        end 
+
+        it "should not increment cached value" do
+          app.stub(:cache_key).and_return('foo:123')
+          app.stub(:cache_get).and_return(10)
+          app.should_not_receive(:cache_set).with('foo:123', 11)
+          app.allowed?(@bar_req)
+        end
+        
+        it 'should return true' do
+          app.allowed?(@bar_req).should be_true
+        end
+      end
+      
+    end
   end
   
   # Would be nicer not to test the protected method explicitly, but seemed somewhat complex, as cache_key only called from subclasses

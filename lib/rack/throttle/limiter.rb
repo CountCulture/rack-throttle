@@ -45,6 +45,7 @@ module Rack; module Throttle
     # @return [Boolean]
     def allowed?(request)
       case
+        when skip_throttling?(request) then true
         when whitelisted?(request) then true
         when blacklisted?(request) then false
         else true # override in subclasses
@@ -199,6 +200,10 @@ module Rack; module Throttle
     # @return [String]
     def http_status(code)
       [code, Rack::Utils::HTTP_STATUS_CODES[code]].join(' ')
+    end
+    
+    def skip_throttling?(request)
+      options[:skip_throttling] && options[:skip_throttling].call(request)
     end
   end
 end; end
