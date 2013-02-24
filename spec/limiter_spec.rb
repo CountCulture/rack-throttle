@@ -70,7 +70,7 @@ describe Rack::Throttle::Limiter do
           it "should ignore whitelisting" do
             app.should_not_receive(:whitelisted?)
             get "/baz"
-          end 
+          end
 
           it "should ignore blacklisting" do
             app.should_not_receive(:blacklisted?)
@@ -98,13 +98,13 @@ describe Rack::Throttle::Limiter do
       last_response.body.should show_throttled_response
     end
   end
-  
+
   # Would be nicer not to test the protected method explicitly, but seemed somewhat complex, as cache_key only called from subclasses
   describe ":cache_key" do
     before do
       @req = mock('request', :ip => '1.2.3.4', :path => '/foo/bar')
     end
-    
+
     describe "with no cache :key_prefix supplied" do
       let(:app) { Rack::Throttle::Limiter.new(target_app ) }
       it "should use request ip address as cache_key" do
@@ -127,4 +127,34 @@ describe Rack::Throttle::Limiter do
       end
     end
   end
+
+  # Would be nicer not to test the protected method explicitly, but seemed somewhat complex, as cache_key only called from subclasses
+  describe "client_identifier" do
+    before do
+      @req = mock('request', :ip => '1.2.3.4', :path => '/foo/bar')
+    end
+
+    describe "with :client_identifier supplied in options" do
+      let(:app) { Rack::Throttle::Limiter.new(target_app ) }
+      it "should use request ip address as client_identifier" do
+        app.send(:client_identifier, @req).should == '1.2.3.4'
+      end
+    end
+
+    # describe "with cache :key_prefix" do
+    #   let(:app) { Rack::Throttle::Limiter.new(target_app, :key_prefix => 'foo' ) }
+    #   it "should join key_prefix and ip address for cache_key" do
+    #     app.send(:client_identifier, @req).should == 'foo:1.2.3.4'
+    #   end
+    # end
+
+    describe "with proc supplied for :client_identifier" do
+      client_identifier = Proc.new { |request| 'baz' + request.path }
+      let(:app) { Rack::Throttle::Limiter.new(target_app, :client_identifier => client_identifier ) }
+      it "should call proc with given request" do
+        app.send(:client_identifier, @req).should == 'baz/foo/bar'
+      end
+    end
+  end
+
 end

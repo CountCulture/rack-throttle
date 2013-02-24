@@ -156,7 +156,7 @@ module Rack; module Throttle
     # @param  [Rack::Request] request
     # @return [String]
     def client_identifier(request)
-      request.ip.to_s
+      client_identifier_option(request) || request.ip.to_s
     end
 
     ##
@@ -201,9 +201,16 @@ module Rack; module Throttle
     def http_status(code)
       [code, Rack::Utils::HTTP_STATUS_CODES[code]].join(' ')
     end
-    
+
     def skip_throttling?(request)
       options[:skip_throttling] && options[:skip_throttling].call(request)
     end
+
+    protected
+    def client_identifier_option(request)
+      options[:client_identifier].is_a?(Proc) ? options[:client_identifier].call(request) : nil
+    end
+
   end
+
 end; end

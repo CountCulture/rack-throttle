@@ -110,6 +110,10 @@ Examples
 
     use Rack::Throttle::Interval, :key => Proc.new { |request| request.content_type + request.ip }
     
+### Changing the client_identifier
+
+    use Rack::Throttle::Interval, :client_identifier => Proc.new { |request| request.params['api_token'] }
+
 Throttling Strategies
 ---------------------
 
