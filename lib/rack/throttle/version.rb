@@ -1,7 +1,7 @@
 module Rack; module Throttle
   module VERSION
     MAJOR = 0
-    MINOR = 7
+    MINOR = 8
     TINY  = 0
     EXTRA = nil
 

@@ -5,6 +5,7 @@ module Rack
     autoload :Limiter,    'rack/throttle/limiter'
     autoload :Interval,   'rack/throttle/interval'
     autoload :TimeWindow, 'rack/throttle/time_window'
+    autoload :Monthly,    'rack/throttle/monthly'
     autoload :Daily,      'rack/throttle/daily'
     autoload :Hourly,     'rack/throttle/hourly'
     autoload :Minute,     'rack/throttle/minute'

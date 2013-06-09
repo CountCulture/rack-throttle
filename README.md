@@ -13,7 +13,7 @@ Features
 
 * Throttles a Rack application by enforcing a minimum time interval between
   subsequent HTTP requests from a particular client, as well as by defining
-  a maximum number of allowed HTTP requests per a given time period (per minute, 
+  a maximum number of allowed HTTP requests per a given time period (per minute,
   hourly, or daily).
 * Compatible with any Rack application and any Rack-based framework.
 * Stores rate-limiting counters in any key/value store implementation that
@@ -33,7 +33,7 @@ Examples
 
     # config/application.rb
     require 'rack/throttle'
-    
+
     class Application < Rails::Application
       config.middleware.use Rack::Throttle::Interval
     end
@@ -43,18 +43,18 @@ Examples
     #!/usr/bin/env ruby -rubygems
     require 'sinatra'
     require 'rack/throttle'
-    
+
     use Rack::Throttle::Interval
-    
+
     get('/hello') { "Hello, world!\n" }
 
 ### Adding throttling to a Rackup application
 
     #!/usr/bin/env rackup
     require 'rack/throttle'
-    
+
     use Rack::Throttle::Interval
-    
+
     run lambda { |env| [200, {'Content-Type' => 'text/plain'}, "Hello, world!\n"] }
 
 ### Enforcing a minimum 3-second interval between requests
@@ -82,34 +82,34 @@ Examples
 
 ### Using a proc for max value
 
-    use Rack::Throttle::Hourly,   :max => Proc.new { |request| request.params['api_token'] ? 1000 : 100 }  
+    use Rack::Throttle::Hourly,   :max => Proc.new { |request| request.params['api_token'] ? 1000 : 100 }
 
 ### Using a proc to skip throttling for certain requests
 
-    use Rack::Throttle::Hourly,   :skip_throttling => Proc.new { |request| request.path_info.match(/documentation/) }  
+    use Rack::Throttle::Hourly,   :skip_throttling => Proc.new { |request| request.path_info.match(/documentation/) }
 
 ### Storing the rate-limiting counters in a GDBM database
 
     require 'gdbm'
-    
+
     use Rack::Throttle::Interval, :cache => GDBM.new('tmp/throttle.db')
 
 ### Storing the rate-limiting counters on a Memcached server
 
     require 'memcached'
-    
+
     use Rack::Throttle::Interval, :cache => Memcached.new, :key_prefix => :throttle
 
 ### Storing the rate-limiting counters on a Redis server
 
     require 'redis'
-    
+
     use Rack::Throttle::Interval, :cache => Redis.new, :key_prefix => :throttle
 
 ### Changing the cache key (note you'll need to explicitly extract the ip address, assuming you want to want this to form part of the key)
 
     use Rack::Throttle::Interval, :key => Proc.new { |request| request.content_type + request.ip }
-    
+
 ### Changing the client_identifier
 
     use Rack::Throttle::Interval, :client_identifier => Proc.new { |request| request.params['api_token'] }
@@ -133,6 +133,9 @@ Throttling Strategies
   maximum number of allowed HTTP requests per day (by default, 86,400
   requests per 24 hours, which works out to an average of 1 request per
   second).
+* `Rack::Throttle::Monthly`: Throttles the application by defining a
+  maximum number of allowed HTTP requests per day (by default, 100,000
+  requests per month
 
 You can fully customize the implementation details of any of these strategies
 by simply subclassing one of the aforementioned default implementations.
