@@ -4,6 +4,7 @@
 $: << File.dirname(__FILE__) + "/lib"
 
 require 'rack/throttle/version'
+require 'date'
 
 Gem::Specification.new do |gem|
   gem.version            = Rack::Throttle::VERSION.to_s
